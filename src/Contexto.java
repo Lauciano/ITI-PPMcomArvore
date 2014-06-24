@@ -481,31 +481,4 @@ public class Contexto {
 			
 		}
 	};
-	
-	public static void main(String args[]){
-		
-		Contexto raiz = new Contexto(0);
-		Leitor l = new Leitor("texto.txt");
-		ArrayList<Intervalo> intv = raiz.geraCodigo(raiz, l, 2);
-		
-		System.out.println("Saida:");
-		for(Intervalo i : intv){
-			System.out.println(i);
-		}
-		
-		/*Contexto raiz = new Contexto(0);
-		for(int i = 0; i < 2; i++){
-			Contexto c1 = new Contexto(i);
-			for(int j = 0; j < 2; j++){
-				Contexto c2 = new Contexto(j);
-				c1.addOcorrencia(c2);
-			}
-			raiz.addOcorrencia(c1);
-		}
-		Contexto c3 = new Contexto(1);
-		ArrayList<Byte> contexto = new ArrayList<Byte>();
-		contexto.add((byte) 0);
-		raiz.addOcorrencia(c3, contexto, (byte) 0, -1);*/
-		return;
-	}
 }
