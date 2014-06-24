@@ -50,7 +50,7 @@ public class Leitor {
 					}
 				}
 			}
-			br.close();
+			br2.close();
 			
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo não encontrado!");
@@ -65,6 +65,8 @@ public class Leitor {
 	}
 	
 	public Byte getNextByte(){
+		
+		//System.out.println("Entrei!");
 		
 		try {
 			br.ready();

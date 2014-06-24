@@ -48,11 +48,40 @@ public class Contexto {
 		ArrayList<Intervalo> codigo = new ArrayList<Intervalo>();
 		ArrayList<Byte> ultimos = new ArrayList<Byte>();
 		ArrayList<Byte> alfabeto = leitor.getAlfabeto();
+		ArrayList<Byte> contextoTemp = new ArrayList<Byte>();
 		Collections.sort(alfabeto);
 		Byte lido;
 		
+		
 		while((lido = leitor.getNextByte()) != null){
 			
+			System.out.println("Byte lido = " + lido);
+			
+			ultimos.add(lido);
+			
+			for(int i = -1, j = contextoMaximo; i <= contextoMaximo; i++, j--){
+				System.out.println("i = " + i + " j = " + j);
+				if(ultimos.size() < j) continue;
+				
+				if(j > 0){
+					System.err.println("If");
+					for(int k = 0; k < j; k++){
+						contextoTemp.add(ultimos.get(ultimos.size() - 1 - k));
+					}
+					Contexto c = new Contexto(lido);
+					raiz.addOcorrencia(c, contextoTemp, -1);
+				}else if(j == 0){
+					System.err.println("ElseIf");
+					Contexto c = new Contexto(lido);
+					raiz.addOcorrencia(c);
+				}else{
+					System.err.println("Else");
+					System.out.println("Remove de K1");
+				}
+				
+				System.out.println("\n\n\n");
+				
+			}
 		}
 		
 		return null;
@@ -99,7 +128,7 @@ public class Contexto {
 		atualizaIntervalo();
 	}
 	
-	public void addOcorrencia(Contexto ocorrencia, ArrayList<Byte> contexto, byte valor, int nivel){
+	public void addOcorrencia(Contexto ocorrencia, ArrayList<Byte> contexto, int nivel){
 		if(nivel > -1){
 			if(this.getValor() != contexto.get(nivel)) return;
 		}
@@ -112,7 +141,7 @@ public class Contexto {
 		}
 		
 		for(Contexto c : filhos){
-			c.addOcorrencia(ocorrencia, contexto, valor, nivel + 1);
+			c.addOcorrencia(ocorrencia, contexto, nivel + 1);
 		}
 	}
 	
@@ -376,7 +405,12 @@ public class Contexto {
 	};
 	
 	public static void main(String args[]){
+		
 		Contexto raiz = new Contexto(0);
+		Leitor l = new Leitor("texto.txt");
+		raiz.geraCodigo(raiz, l, 1);
+		
+		/*Contexto raiz = new Contexto(0);
 		for(int i = 0; i < 2; i++){
 			Contexto c1 = new Contexto(i);
 			for(int j = 0; j < 2; j++){
@@ -388,7 +422,7 @@ public class Contexto {
 		Contexto c3 = new Contexto(1);
 		ArrayList<Byte> contexto = new ArrayList<Byte>();
 		contexto.add((byte) 0);
-		raiz.addOcorrencia(c3, contexto, (byte) 0, -1);
+		raiz.addOcorrencia(c3, contexto, (byte) 0, -1);*/
 		return;
 	}
 }
