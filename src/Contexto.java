@@ -68,7 +68,6 @@ public class Contexto {
 			contextoTemp = new ArrayList<Byte>();
 			System.out.println("lido = " + lido);
 
-			
 			//Atualiza a Tabela e Pega intervalos
 			for(int i = -1, j = contextoMaximo; i <= contextoMaximo; i++, j--){
 				if(ultimos.size() < j) continue;
@@ -80,7 +79,7 @@ public class Contexto {
 					
 					//Pega Intervalo
 					Intervalo intv = null;
-					System.out.println(contextoTemp + " e lido " + lido);
+					//System.out.println("CTEMP = " + contextoTemp + " e lido " + lido);
  					if((jaEntrou == false) && (intv = raiz.getIntervalo(contextoTemp, lido, -1)) != null){
 						jaEntrou = true;
 						System.out.println("Inserido 1: " + intv);
@@ -90,8 +89,8 @@ public class Contexto {
 						codigo.add(new Intervalo(intv));
 					}
 					
-					
 					Contexto c = new Contexto(lido);
+					//System.out.println("Inserindo " + c + " " + contextoTemp);
 					raiz.addOcorrencia(c, contextoTemp, -1);
 				}else if(j == 0){
 					
@@ -192,7 +191,7 @@ public class Contexto {
 	
 	public void addOcorrencia(Contexto ocorrencia, ArrayList<Byte> contexto, int nivel){
 		if(nivel > -1){
-			if(this.getValor() != contexto.get(nivel)) return;
+			if(isEsc() || this.getValor() != contexto.get(nivel)) return;
 		}
 		
 		if(nivel == contexto.size() - 1) {
@@ -287,12 +286,12 @@ public class Contexto {
 	
 	public Intervalo getIntervaloEsc(ArrayList<Byte> contexto, int nivel) {
 		if(nivel > -1){
-			if(this.getValor() != contexto.get(nivel)) return null;
+			if(isEsc() || (this.getValor() != contexto.get(nivel))) return null;
 		}
 		
 		if(nivel == contexto.size() - 1) {
+			System.out.println("Contexto size " + contexto.size() + " "  + filhos.size());
 			Contexto filho = null;
-			if(this.isEsc()) return null;
 			for(Contexto c : filhos){
 				if(c.isEsc()){
 					filho = c;
@@ -327,11 +326,8 @@ public class Contexto {
 	}
 	
 	public Intervalo getIntervalo(ArrayList<Byte> contexto, byte valor, int nivel) {
-		
-		System.out.println("nivel = " + nivel);
 
 		if(nivel > -1){
-			System.out.println(" contexto = " + contexto.get(nivel));
 			if(isEsc() || (this.getValor() != contexto.get(nivel))) return null;
 		}
 		
@@ -347,8 +343,6 @@ public class Contexto {
 			if(filho == null) return null;
 			return filho.getIntervalo();
 		}
-		
-		System.out.println(" Meu Valor = " + getValor() + "  " + isEsc());
 		
 		for(Contexto c : filhos){
 			Intervalo res = c.getIntervalo(contexto, valor, nivel+1);
