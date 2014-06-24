@@ -59,10 +59,6 @@ public class Contexto {
 		}
 		km1.removeEsc();
 		
-		for(Contexto t : km1.getFilhos()){
-			System.out.println(t);
-		}
-		
 		while((lido = leitor.getNextByte()) != null){
 			
 			System.out.println("lido = " + lido);
@@ -92,6 +88,9 @@ public class Contexto {
 					Contexto c = new Contexto(lido);
 					//System.out.println("Inserindo " + c + " " + contextoTemp);
 					raiz.addOcorrencia(c, contextoTemp, -1);
+					if(raiz.getTotalFilhos(contextoTemp, -1) == alfabeto.size() + 1){
+						raiz.removeEsc(contextoTemp, -1);
+					}
 				}else if(j == 0){
 					
 					Intervalo intv = null;
@@ -106,6 +105,9 @@ public class Contexto {
 					
 					Contexto c = new Contexto(lido);
 					raiz.addOcorrencia(c);
+					if(raiz.getFilhos().size() == alfabeto.size() + 1){
+						raiz.removeEsc();
+					}
 				}else{
 					
 					if(jaEntrou == false){
@@ -126,6 +128,44 @@ public class Contexto {
 	}
 	
 	// Árvore
+	
+	public int getTotalFilhos(ArrayList<Byte> contexto, int nivel){
+		if(nivel > -1){
+			if(this.isEsc() || (this.getValor() != contexto.get(nivel))) return -1;
+		}
+		
+		if(nivel == contexto.size() - 1) {
+			
+			if(this.isEsc()) return -1;
+			
+			return filhos.size();
+			
+		}
+		
+		for(Contexto c : filhos){
+			int res = c.getTotalFilhos(contexto, nivel+1);
+			if(res != -1){
+				return res;
+			}
+		}
+		
+		return -1;
+	}
+	
+	public void removeEsc(ArrayList<Byte> contexto, int nivel){
+		if(nivel > -1){
+			if(this.getValor() != contexto.get(nivel)) return;
+		}
+		
+		if(nivel == contexto.size() - 1) {
+			removeEsc();
+		}
+		
+		for(Contexto c : filhos){
+			c.removeEsc(contexto, nivel+1);
+		}
+
+	}
 	
 	public void removeEsc(){
 		for(int i = 0 ; i < filhos.size(); i++){
@@ -435,7 +475,10 @@ public class Contexto {
 		public int compare(Contexto inst1,Contexto inst2){
 			if(inst1.isEsc()) return 1;
 			if(inst2.isEsc()) return -1;
-			return inst1.getValor() - inst2.getValor();
+			if(inst1.getFrequencia() == inst2.getFrequencia()){
+				return inst1.getValor() - inst2.getValor();
+			}else return inst2.getFrequencia() - inst1.getFrequencia();
+			
 		}
 	};
 	
