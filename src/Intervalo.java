@@ -9,6 +9,11 @@ public class Intervalo {
 		this.fim = fim;
 	}
 	
+	public Intervalo(Intervalo i){
+		this.inicio = i.inicio;
+		this.fim = i.fim;
+	}
+	
 	// Getters e Setters
 	
 	public double getInicio() {

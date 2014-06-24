@@ -48,46 +48,108 @@ public class Contexto {
 		ArrayList<Intervalo> codigo = new ArrayList<Intervalo>();
 		ArrayList<Byte> ultimos = new ArrayList<Byte>();
 		ArrayList<Byte> alfabeto = leitor.getAlfabeto();
-		ArrayList<Byte> contextoTemp = new ArrayList<Byte>();
+		ArrayList<Byte> contextoTemp;
 		Collections.sort(alfabeto);
 		Byte lido;
+		boolean jaEntrou = false;
 		
+		Contexto km1 = new Contexto(0);
+		for(Byte i : alfabeto){
+			km1.addOcorrencia(new Contexto(i));
+		}
+		km1.removeEsc();
+		
+		for(Contexto t : km1.getFilhos()){
+			System.out.println(t);
+		}
 		
 		while((lido = leitor.getNextByte()) != null){
 			
-			System.out.println("Byte lido = " + lido);
+			contextoTemp = new ArrayList<Byte>();
+			System.out.println("lido = " + lido);
+
 			
-			ultimos.add(lido);
-			
+			//Atualiza a Tabela e Pega intervalos
 			for(int i = -1, j = contextoMaximo; i <= contextoMaximo; i++, j--){
-				System.out.println("i = " + i + " j = " + j);
 				if(ultimos.size() < j) continue;
 				
 				if(j > 0){
-					System.err.println("If");
 					for(int k = 0; k < j; k++){
 						contextoTemp.add(ultimos.get(ultimos.size() - 1 - k));
 					}
+					
+					//Pega Intervalo
+					Intervalo intv = null;
+					System.out.println(contextoTemp + " e lido " + lido);
+ 					if((jaEntrou == false) && (intv = raiz.getIntervalo(contextoTemp, lido, -1)) != null){
+						jaEntrou = true;
+						System.out.println("Inserido 1: " + intv);
+						codigo.add(new Intervalo(intv));
+					}else if((jaEntrou == false) && (intv = raiz.getIntervaloEsc(contextoTemp, -1)) != null){
+						System.out.println("Inserido ESC 1: " + intv);
+						codigo.add(new Intervalo(intv));
+					}
+					
+					
 					Contexto c = new Contexto(lido);
 					raiz.addOcorrencia(c, contextoTemp, -1);
 				}else if(j == 0){
-					System.err.println("ElseIf");
+					
+					Intervalo intv = null;
+					if((jaEntrou == false) && (intv = raiz.getIntervalo(lido)) != null){
+						jaEntrou = true;
+						System.out.println("Inserido 0: " + intv);
+						codigo.add(new Intervalo(intv));
+					}else if((jaEntrou == false) && (intv = raiz.getIntervaloEsc()) != null){
+						System.out.println("Inserido ESC 0: " + intv);
+						codigo.add(new Intervalo(intv));
+					}
+					
 					Contexto c = new Contexto(lido);
 					raiz.addOcorrencia(c);
 				}else{
-					System.err.println("Else");
-					System.out.println("Remove de K1");
+					
+					if(jaEntrou == false){
+						System.out.println("Inserido -1: " + km1.getIntervalo(lido));
+						codigo.add(new Intervalo(km1.getIntervalo(lido)));
+					}
+					km1.removeOcorrencia(lido);
 				}
 				
-				System.out.println("\n\n\n");
+				//System.out.println("\n\n\n");
 				
 			}
+			jaEntrou = false;
+			ultimos.add(lido);
 		}
 		
-		return null;
+		return codigo;
 	}
 	
 	// Árvore
+	
+	public void removeEsc(){
+		for(int i = 0 ; i < filhos.size(); i++){
+			if(filhos.get(i).isEsc()){
+				filhos.remove(i);
+				break;
+			}
+		}
+		this.atualizaProbabilidade();
+		this.atualizaIntervalo();
+	}
+	
+	public void removeOcorrencia(byte b){
+		for(int i = 0 ; i < filhos.size(); i++){
+			if((!filhos.get(i).isEsc()) && filhos.get(i).getValor() == b){
+				filhos.remove(i);
+				break;
+			}
+		}
+		this.atualizaProbabilidade();
+		this.atualizaIntervalo();
+	}
+	
 	public void atualizaIntervalo(){
 		double aux = 0;
 		for(Contexto c : filhos){
@@ -148,7 +210,7 @@ public class Contexto {
 	public boolean temOcorrencia(byte v){
 		if(filhos.isEmpty()) return false;
 		for(Contexto c : filhos){
-			if(c.getValor() == v){
+			if((!c.isEsc()) && c.getValor() == v){
 				return true;
 			}
 		}
@@ -210,7 +272,20 @@ public class Contexto {
 		return intervalo;
 	}
 	
-	public Intervalo getIntervalo(ArrayList<Byte> contexto, int nivel) {
+	public Intervalo getIntervaloEsc(){
+		Contexto filho = null;
+		if(this.isEsc()) return null;
+		for(Contexto c : filhos){
+			if(c.isEsc()){
+				filho = c;
+				break;
+			}
+		}
+		if(filho == null) return null;
+		return filho.getIntervalo();		
+	}
+	
+	public Intervalo getIntervaloEsc(ArrayList<Byte> contexto, int nivel) {
 		if(nivel > -1){
 			if(this.getValor() != contexto.get(nivel)) return null;
 		}
@@ -229,18 +304,35 @@ public class Contexto {
 		}
 		
 		for(Contexto c : filhos){
-			Intervalo res = c.getIntervalo(contexto, nivel+1);
+			Intervalo res = c.getIntervaloEsc(contexto, nivel+1);
 			if(res != null){
 				return res;
 			}
 		}
 		
 		return null;
-	}	
+	}
+	
+	public Intervalo getIntervalo(byte valor){
+		Contexto filho = null;
+		if(this.isEsc()) return null;
+		for(Contexto c : filhos){
+			if(!c.isEsc() && c.getValor() == valor){
+				filho = c;
+				break;
+			}
+		}
+		if(filho == null) return null;
+		return filho.getIntervalo();		
+	}
 	
 	public Intervalo getIntervalo(ArrayList<Byte> contexto, byte valor, int nivel) {
+		
+		System.out.println("nivel = " + nivel);
+
 		if(nivel > -1){
-			if(this.getValor() != contexto.get(nivel)) return null;
+			System.out.println(" contexto = " + contexto.get(nivel));
+			if(isEsc() || (this.getValor() != contexto.get(nivel))) return null;
 		}
 		
 		if(nivel == contexto.size() - 1) {
@@ -255,6 +347,8 @@ public class Contexto {
 			if(filho == null) return null;
 			return filho.getIntervalo();
 		}
+		
+		System.out.println(" Meu Valor = " + getValor() + "  " + isEsc());
 		
 		for(Contexto c : filhos){
 			Intervalo res = c.getIntervalo(contexto, valor, nivel+1);
@@ -329,60 +423,7 @@ public class Contexto {
 	public void setProbabilidade(double probabilidade) {
 		this.probabilidade = probabilidade;
 	}
-	
-	/*public double getProbabilidade(ArrayList<Byte> contexto, byte valor, int nivel){
-		if(nivel > -1){
-			if(this.getValor() != contexto.get(nivel)) return -1;
-		}
-		
-		if(nivel == contexto.size() - 1) {
-			double contador = 0;
-			Contexto filho = null;
-			if(this.isEsc()) return -1;
-			for(Contexto c : filhos){
-				contador += c.frequencia;
-				if(!c.isEsc() && c.getValor() == valor){
-					filho = c;
-				}
-			}
-			if(filho == null) return -1;
-			return filho.getFrequencia()/contador;
-		}
-		
-		for(Contexto c : filhos){
-			double res = c.getProbabilidade(contexto, valor, nivel+1);
-			if(res != -1){
-				return res;
-			}
-		}
-		
-		return -1;
-	}
-	
-	public double getProbabilidade(ArrayList<Byte> contexto, byte valor, int posicao, int nivel) {
-		if(nivel == contexto.size() - 1) {
-			double contador = 0;
-			Contexto filho = null;
-			if(this.isEsc()) return -1;
-			for(Contexto c : filhos){
-				contador += c.frequencia;
-				if(!c.isEsc() && c.getValor() == valor){
-					filho = c;
-				}
-			}
-			if(filho == null) return -1;
-			return filho.getFrequencia()/contador;
-		}
-		
-		for(Contexto c : filhos){
-			if(c.getValor() == contexto.get(posicao)){
-				return c.getProbabilidade(contexto, valor, posicao + 1, nivel + 1);
-			}
-		}
-		
-		return -1;
-	}*/
-	
+
 	public int getTotal(){
 		int total = 0;
 		for(Contexto c : filhos){
@@ -393,7 +434,7 @@ public class Contexto {
 	
 	// To String
 	public String toString(){
-		return (valor&0xFF) + " " + frequencia;
+		return (valor&0xFF) + " " + frequencia + " " + intervalo;
 	}
 	
 	public static Comparator<Contexto> ContextoComparator = new Comparator<Contexto>(){
@@ -408,7 +449,12 @@ public class Contexto {
 		
 		Contexto raiz = new Contexto(0);
 		Leitor l = new Leitor("texto.txt");
-		raiz.geraCodigo(raiz, l, 1);
+		ArrayList<Intervalo> intv = raiz.geraCodigo(raiz, l, 2);
+		
+		System.out.println("Saida:");
+		for(Intervalo i : intv){
+			System.out.println(i);
+		}
 		
 		/*Contexto raiz = new Contexto(0);
 		for(int i = 0; i < 2; i++){
