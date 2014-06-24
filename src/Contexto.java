@@ -65,11 +65,11 @@ public class Contexto {
 		
 		while((lido = leitor.getNextByte()) != null){
 			
-			contextoTemp = new ArrayList<Byte>();
 			System.out.println("lido = " + lido);
 
 			//Atualiza a Tabela e Pega intervalos
 			for(int i = -1, j = contextoMaximo; i <= contextoMaximo; i++, j--){
+				contextoTemp = new ArrayList<Byte>();
 				if(ultimos.size() < j) continue;
 				
 				if(j > 0){
