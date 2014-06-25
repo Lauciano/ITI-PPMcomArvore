@@ -1,18 +1,37 @@
+import com.colloquial.arithcode.ArithEncoder;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
 	public static void main(String args[]){
 		
 		Contexto raiz = new Contexto(0);
 		Leitor leitor = new Leitor("texto.txt"); // Arquivo a ser lido
-		
+                FileOutputStream fop = null;
+                try {
+                    fop = new FileOutputStream(new File("saida.txt").getAbsoluteFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+		ArithEncoder encoder = new ArithEncoder(fop);
+                
 		//Chamada
-		//Parâmetros
+		//Parï¿½metros
 		//O contexto raiz
 		//O leitor
-		//O contexto máximo k passado como parâmetro
-		// Atenção: ainda não está tratando o mecanismo de exclusão
-		//          mesmo assim funciona para o caso de não usá-lo
+		//O contexto mï¿½ximo k passado como parï¿½metro
+		// Atenï¿½ï¿½o: ainda nï¿½o estï¿½ tratando o mecanismo de exclusï¿½o
+		//          mesmo assim funciona para o caso de nï¿½o usï¿½-lo
 		//ArrayList<Intervalo> intv = Contexto.geraCodigo(raiz, leitor, 2);
 		//System.out.println("Saida:");
 		//for(Intervalo i : intv){
@@ -20,12 +39,12 @@ public class Main {
 		//}
 		
 		//Chamada
-		//Parâmetros
+		//Parï¿½metros
 		//O contexto raiz
 		//O leitor
-		//O contexto máximo k passado como parâmetro
-		// Atenção: ainda não está tratando o mecanismo de exclusão
-		//          mesmo assim funciona para o caso de não usá-lo
+		//O contexto mï¿½ximo k passado como parï¿½metro
+		// Atenï¿½ï¿½o: ainda nï¿½o estï¿½ tratando o mecanismo de exclusï¿½o
+		//          mesmo assim funciona para o caso de nï¿½o usï¿½-lo
 		// Retorno:
 		//		Inteiro		low
 		//					high
@@ -33,7 +52,12 @@ public class Main {
 		ArrayList<Codigo> inteiro = Contexto.geraCodigoInteiro(raiz, leitor, 2);
 		System.out.println("Saida:");
 		for(Codigo i : inteiro){
-			System.out.println(i);
+                    System.out.println(i);
+                    try {
+                        encoder.encode(i.getLow(), i.getHigh(), i.getTotal());
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 		}
 		
 		return;
