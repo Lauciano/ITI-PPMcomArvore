@@ -13,10 +13,26 @@ public class Main {
 		//O contexto máximo k passado como parâmetro
 		// Atenção: ainda não está tratando o mecanismo de exclusão
 		//          mesmo assim funciona para o caso de não usá-lo
-		ArrayList<Intervalo> intv = Contexto.geraCodigo(raiz, leitor, 2);
+		//ArrayList<Intervalo> intv = Contexto.geraCodigo(raiz, leitor, 2);
+		//System.out.println("Saida:");
+		//for(Intervalo i : intv){
+		//	System.out.println(i);
+		//}
 		
+		//Chamada
+		//Parâmetros
+		//O contexto raiz
+		//O leitor
+		//O contexto máximo k passado como parâmetro
+		// Atenção: ainda não está tratando o mecanismo de exclusão
+		//          mesmo assim funciona para o caso de não usá-lo
+		// Retorno:
+		//		Inteiro		low
+		//					high
+		//					total
+		ArrayList<Codigo> inteiro = Contexto.geraCodigoInteiro(raiz, leitor, 2);
 		System.out.println("Saida:");
-		for(Intervalo i : intv){
+		for(Codigo i : inteiro){
 			System.out.println(i);
 		}
 		

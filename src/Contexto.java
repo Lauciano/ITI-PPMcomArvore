@@ -7,6 +7,7 @@ public class Contexto {
 	private byte valor;
 	private int  frequencia;
 	private double probabilidade;
+	private Codigo intervaloInteiro;
 	private Intervalo intervalo;
 	private ArrayList<Contexto> filhos;
 	
@@ -21,6 +22,7 @@ public class Contexto {
 			filhos.add(new Contexto(i));
 		}
 		probabilidade = c.probabilidade;
+		intervaloInteiro = new Codigo(c.intervaloInteiro.getLow(), c.intervaloInteiro.getHigh());
 		intervalo = new Intervalo(c.intervalo.getInicio(), c.intervalo.getFim());
 	}
 	
@@ -31,6 +33,7 @@ public class Contexto {
 		this.frequencia = 1;
 		this.filhos = new ArrayList<Contexto>();
 		probabilidade = 1;
+		intervaloInteiro = new Codigo(0, 1);
 		intervalo = new Intervalo(0, 1);
 	}
 	
@@ -40,10 +43,104 @@ public class Contexto {
 		this.frequencia = 1;
 		this.filhos = null;
 		this.probabilidade = 1;
+		this.intervaloInteiro = new Codigo(0, 1);
 		this.intervalo = new Intervalo(0, 1);
 	}
 	
 	// Codificação
+	public static ArrayList<Codigo> geraCodigoInteiro(Contexto raiz, Leitor leitor, int contextoMaximo){
+		ArrayList<Codigo> codigo = new ArrayList<Codigo>();
+		ArrayList<Byte> ultimos = new ArrayList<Byte>();
+		ArrayList<Byte> alfabeto = leitor.getAlfabeto();
+		ArrayList<Byte> contextoTemp;
+		Collections.sort(alfabeto);
+		Byte lido;
+		boolean jaEntrou = false;
+		
+		Contexto km1 = new Contexto(0);
+		for(Byte i : alfabeto){
+			km1.addOcorrencia(new Contexto(i));
+		}
+		km1.removeEsc();
+		
+		while((lido = leitor.getNextByte()) != null){
+			
+			System.out.println("lido = " + lido);
+
+			//Atualiza a Tabela e Pega intervalos
+			for(int i = -1, j = contextoMaximo; i <= contextoMaximo; i++, j--){
+				contextoTemp = new ArrayList<Byte>();
+				if(ultimos.size() < j) continue;
+				
+				if(j > 0){
+					for(int k = 0; k < j; k++){
+						contextoTemp.add(ultimos.get(ultimos.size() - 1 - k));
+					}
+					
+					//Pega Intervalo
+					Codigo intv = null;
+					//System.out.println("CTEMP = " + contextoTemp + " e lido " + lido);
+ 					if((jaEntrou == false) && (intv = raiz.getIntervaloInteiro(contextoTemp, lido, -1)) != null){
+						jaEntrou = true;
+						Codigo intervalo = new Codigo(intv);
+						intervalo.setTotal(raiz.getTotalFrequencias(contextoTemp, -1));
+						System.out.println("Inserido 1: " + intervalo);
+						codigo.add(intervalo);
+					}else if((jaEntrou == false) && (intv = raiz.getIntervaloInteiroEsc(contextoTemp, -1)) != null){
+						Codigo intervalo = new Codigo(intv);
+						intervalo.setTotal(raiz.getTotalFrequencias(contextoTemp, -1));
+						System.out.println("Inserido ESC 1: " + intervalo);
+						codigo.add(intervalo);
+					}
+					
+					Contexto c = new Contexto(lido);
+					//System.out.println("Inserindo " + c + " " + contextoTemp);
+					raiz.addOcorrencia(c, contextoTemp, -1);
+					if(raiz.getTotalFilhos(contextoTemp, -1) == alfabeto.size() + 1){
+						raiz.removeEsc(contextoTemp, -1);
+					}
+				}else if(j == 0){
+					
+					Codigo intv = null;
+					if((jaEntrou == false) && (intv = raiz.getIntervaloInteiro(lido)) != null){
+						jaEntrou = true;
+						Codigo intervalo = new Codigo(intv);
+						intervalo.setTotal(raiz.getTotal());
+						System.out.println("Inserido 0: " + intervalo);
+						codigo.add(intervalo);
+					}else if((jaEntrou == false) && (intv = raiz.getIntervaloInteiroEsc()) != null){
+						Codigo intervalo = new Codigo(intv);
+						intervalo.setTotal(raiz.getTotal());
+						System.out.println("Inserido ESC 0: " + intervalo);
+						codigo.add(intervalo);
+					}
+					
+					Contexto c = new Contexto(lido);
+					raiz.addOcorrencia(c);
+					if(raiz.getFilhos().size() == alfabeto.size() + 1){
+						raiz.removeEsc();
+					}
+				}else{
+					
+					if(jaEntrou == false){
+						Codigo intervalo = new Codigo(km1.getIntervaloInteiro(lido));
+						intervalo.setTotal(km1.getTotal());
+						System.out.println("Inserido -1: " + intervalo);
+						codigo.add(intervalo);
+					}
+					km1.removeOcorrencia(lido);
+				}
+				
+				//System.out.println("\n\n\n");
+				
+			}
+			jaEntrou = false;
+			ultimos.add(lido);
+		}
+		
+		return codigo;
+	}
+	
 	public static ArrayList<Intervalo> geraCodigo(Contexto raiz, Leitor leitor, int contextoMaximo){
 		ArrayList<Intervalo> codigo = new ArrayList<Intervalo>();
 		ArrayList<Byte> ultimos = new ArrayList<Byte>();
@@ -176,6 +273,7 @@ public class Contexto {
 		}
 		this.atualizaProbabilidade();
 		this.atualizaIntervalo();
+		this.atualizaIntervaloInteiro();
 	}
 	
 	public void removeOcorrencia(byte b){
@@ -187,6 +285,7 @@ public class Contexto {
 		}
 		this.atualizaProbabilidade();
 		this.atualizaIntervalo();
+		this.atualizaIntervaloInteiro();
 	}
 	
 	public void atualizaIntervalo(){
@@ -227,6 +326,7 @@ public class Contexto {
 		Collections.sort(filhos, Contexto.ContextoComparator);
 		atualizaProbabilidade();
 		atualizaIntervalo();
+		atualizaIntervaloInteiro();
 	}
 	
 	public void addOcorrencia(Contexto ocorrencia, ArrayList<Byte> contexto, int nivel){
@@ -460,10 +560,133 @@ public class Contexto {
 
 	public int getTotal(){
 		int total = 0;
+		if(isEsc()) return -1;
 		for(Contexto c : filhos){
 			total += c.getFrequencia();
 		}
 		return total;
+	}
+	
+	public Codigo getIntervaloInteiro(){
+		return intervaloInteiro;
+	}
+	
+	public Codigo getIntervaloInteiroEsc(){
+		Contexto filho = null;
+		if(this.isEsc()) return null;
+		for(Contexto c : filhos){
+			if(c.isEsc()){
+				filho = c;
+				break;
+			}
+		}
+		if(filho == null) return null;
+		return filho.getIntervaloInteiro();		
+	}
+	
+	public Codigo getIntervaloInteiroEsc(ArrayList<Byte> contexto, int nivel) {
+		if(nivel > -1){
+			if(isEsc() || (this.getValor() != contexto.get(nivel))) return null;
+		}
+		
+		if(nivel == contexto.size() - 1) {
+			System.out.println("Contexto size " + contexto.size() + " "  + filhos.size());
+			Contexto filho = null;
+			for(Contexto c : filhos){
+				if(c.isEsc()){
+					filho = c;
+					break;
+				}
+			}
+			if(filho == null) return null;
+			return filho.getIntervaloInteiro();
+		}
+		
+		for(Contexto c : filhos){
+			Codigo res = c.getIntervaloInteiroEsc(contexto, nivel+1);
+			if(res != null){
+				return res;
+			}
+		}
+		
+		return null;
+	}
+	
+	public Codigo getIntervaloInteiro(byte valor){
+		Contexto filho = null;
+		if(this.isEsc()) return null;
+		for(Contexto c : filhos){
+			if(!c.isEsc() && c.getValor() == valor){
+				filho = c;
+				break;
+			}
+		}
+		if(filho == null) return null;
+		return filho.getIntervaloInteiro();		
+	}
+	
+	public Codigo getIntervaloInteiro(ArrayList<Byte> contexto, byte valor, int nivel) {
+
+		if(nivel > -1){
+			if(isEsc() || (this.getValor() != contexto.get(nivel))) return null;
+		}
+		
+		if(nivel == contexto.size() - 1) {
+			Contexto filho = null;
+			if(this.isEsc()) return null;
+			for(Contexto c : filhos){
+				if(!c.isEsc() && c.getValor() == valor){
+					filho = c;
+					break;
+				}
+			}
+			if(filho == null) return null;
+			return filho.getIntervaloInteiro();
+		}
+		
+		for(Contexto c : filhos){
+			Codigo res = c.getIntervaloInteiro(contexto, valor, nivel+1);
+			if(res != null){
+				return res;
+			}
+		}
+		
+		return null;
+	}
+	
+	public int getTotalFrequencias(ArrayList<Byte> contexto, int nivel){
+		if(nivel > -1){
+			if(this.isEsc() || (this.getValor() != contexto.get(nivel))) return -1;
+		}
+		
+		if(nivel == contexto.size() - 1) {
+			
+			if(this.isEsc()) return -1;
+			int contador = 0;
+			for(Contexto c : filhos){
+				contador += c.getFrequencia();
+			}
+			return contador;
+			
+		}
+		
+		for(Contexto c : filhos){
+			int res = c.getTotalFilhos(contexto, nivel+1);
+			if(res != -1){
+				return res;
+			}
+		}
+		
+		return -1;
+	}
+	
+	public void atualizaIntervaloInteiro(){
+		int aux = 0;
+		for(Contexto c : filhos){
+			c.getIntervaloInteiro().setLow(aux);
+			c.getIntervaloInteiro().setHigh(c.getFrequencia() + aux);
+			aux += c.getFrequencia();
+		}
 	}
 	
 	// To String
