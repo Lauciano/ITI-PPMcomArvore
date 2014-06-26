@@ -1,6 +1,5 @@
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,9 +12,10 @@ public class Leitor {
     private DataInputStream data;
     private byte[] simbolo;
     private static boolean proximo = true;
-    private static byte bitfinal = -1;
-    private static int bitfinal_aux = 0;
+    private static byte bitfinal;
+    private static int bitfinal_aux = -1;
     private static int index = 0;
+    private static final int size_simbolo = 1000;
     private String nomeArq;
 
     public Leitor(String nomeArq) throws FileNotFoundException, IOException {
@@ -29,7 +29,7 @@ public class Leitor {
     public ArrayList<Byte> getAlfabeto() throws FileNotFoundException, IOException {
 
         int i, j;
-        byte[] simbolo_aux = new byte[5];
+        byte[] simbolo_aux = new byte[1000];
         ArrayList<Byte> alfabeto = new ArrayList<Byte>();
 
         DataInputStream data_aux = new DataInputStream(new BufferedInputStream(new FileInputStream(nomeArq)));
@@ -63,9 +63,9 @@ public class Leitor {
             }
         }
         
-        if (index < 3) {
-            if (bitfinal != 5) {
-                if (bitfinal_aux < bitfinal) {
+        if (index < size_simbolo-2) {
+            if (bitfinal != size_simbolo) {
+                if (bitfinal_aux < bitfinal-1) {
                     bitfinal_aux++;
                     return simbolo[bitfinal_aux];
                 } else {
@@ -74,13 +74,13 @@ public class Leitor {
                 }
             }
             index++;
-            System.out.println((char) simbolo[index]);
+            //System.out.println((char) simbolo[index]);
             return simbolo[index];
             
         }
         index++;
         proximo = true;
-        System.out.println((char) simbolo[index]);
+        //System.out.println((char) simbolo[index]);
         
         return simbolo[index];
         
