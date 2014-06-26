@@ -69,6 +69,7 @@ public class Leitor {
                     bitfinal_aux++;
                     return simbolo[bitfinal_aux];
                 } else {
+                    data.close();
                     return null;
                 }
             }
