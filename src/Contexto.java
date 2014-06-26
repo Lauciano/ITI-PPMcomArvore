@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,7 +14,7 @@ public class Contexto {
 	private ArrayList<Contexto> filhos;
 	
 	//Construtores
-	//NÃO USAR !!! RECURSÃO!!! SOCORRO!!!!
+	//Nï¿½O USAR !!! RECURSï¿½O!!! SOCORRO!!!!
 	public Contexto(Contexto c){
 		esc = c.esc;
 		valor = c.valor;
@@ -47,8 +49,8 @@ public class Contexto {
 		this.intervalo = new Intervalo(0, 1);
 	}
 	
-	// Codificação
-	public static ArrayList<Codigo> geraCodigoInteiro(Contexto raiz, Leitor leitor, int contextoMaximo){
+	// Codificaï¿½ï¿½o
+	public static ArrayList<Codigo> geraCodigoInteiro(Contexto raiz, Leitor leitor, int contextoMaximo) throws FileNotFoundException, IOException{
 		ArrayList<Codigo> codigo = new ArrayList<Codigo>();
 		ArrayList<Byte> ultimos = new ArrayList<Byte>();
 		ArrayList<Byte> alfabeto = leitor.getAlfabeto();
@@ -141,7 +143,7 @@ public class Contexto {
 		return codigo;
 	}
 	
-	public static ArrayList<Intervalo> geraCodigo(Contexto raiz, Leitor leitor, int contextoMaximo){
+	public static ArrayList<Intervalo> geraCodigo(Contexto raiz, Leitor leitor, int contextoMaximo) throws FileNotFoundException, IOException{
 		ArrayList<Intervalo> codigo = new ArrayList<Intervalo>();
 		ArrayList<Byte> ultimos = new ArrayList<Byte>();
 		ArrayList<Byte> alfabeto = leitor.getAlfabeto();
@@ -224,7 +226,7 @@ public class Contexto {
 		return codigo;
 	}
 	
-	// Árvore
+	// ï¿½rvore
 	
 	public int getTotalFilhos(ArrayList<Byte> contexto, int nivel){
 		if(nivel > -1){
