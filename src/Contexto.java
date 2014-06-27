@@ -57,7 +57,6 @@ public class Contexto {
 		ArrayList<Byte> contextoTemp;
 		Byte lido;
 		boolean jaEntrou = false;
-		boolean deuMerda = false;
 		Contexto km1 = new Contexto(0);
 		for(Byte i : alfabeto){
 			km1.addOcorrencia(new Contexto(i));
@@ -91,25 +90,7 @@ public class Contexto {
 						Codigo intervalo = new Codigo(intv);
 						intervalo.setTotal(raiz.getTotalFrequencias(contextoTemp, -1));
 						////System.out.println("Inserido ESC 1: " + intervalo);
-						codigo.add(intervalo);
-						
-						if(intervalo.getLow() < 0){
-							//System.out.println("Danou-se o mundo no Low do k = " + j + ".");
-							deuMerda = true;
-						}
-						if(intervalo.getHigh() <= intervalo.getLow()){
-							//System.out.println("Danou-se o mundo no High do k = " + j + ".");
-							deuMerda = true;
-						}
-						if(intervalo.getTotal() < intervalo.getHigh()){
-							//System.out.println("Danou-se o mundo no Total do k = " + j + ".");
-							deuMerda = true;
-						}
-						if(deuMerda){
-							//System.out.println(intervalo);
-							deuMerda = false;
-						}
-						
+						codigo.add(intervalo);						
 					}
 					
 					Contexto c = new Contexto(lido);
@@ -126,48 +107,12 @@ public class Contexto {
 						Codigo intervalo = new Codigo(intv);
 						intervalo.setTotal(raiz.getTotal());
 						////System.out.println("Inserido 0: " + intervalo);
-						codigo.add(intervalo);
-						
-						if(intervalo.getLow() < 0){
-							//System.out.println("Danou-se o mundo no Low do k = 0.");
-							deuMerda = true;
-						}
-						if(intervalo.getHigh() <= intervalo.getLow()){
-							//System.out.println("Danou-se o mundo no High do k = 0.");
-							deuMerda = true;
-						}
-						if(intervalo.getTotal() < intervalo.getHigh()){
-							//System.out.println("Danou-se o mundo no Total do k = 0.");
-							deuMerda = true;
-						}
-						if(deuMerda){
-							//System.out.println(intervalo);
-							deuMerda = false;
-						}
-						
+						codigo.add(intervalo);						
 					}else if((jaEntrou == false) && (intv = raiz.getIntervaloInteiroEsc()) != null){
 						Codigo intervalo = new Codigo(intv);
 						intervalo.setTotal(raiz.getTotal());
 						////System.out.println("Inserido ESC 0: " + intervalo);
-						codigo.add(intervalo);
-						
-						if(intervalo.getLow() < 0){
-							//System.out.println("Danou-se o mundo no Low do k = 0.");
-							deuMerda = true;
-						}
-						if(intervalo.getHigh() <= intervalo.getLow()){
-							//System.out.println("Danou-se o mundo no High do k = 0.");
-							deuMerda = true;
-						}
-						if(intervalo.getTotal() < intervalo.getHigh()){
-							//System.out.println("Danou-se o mundo no Total do k = 0.");
-							deuMerda = true;
-						}
-						if(deuMerda){
-							//System.out.println(intervalo);
-							deuMerda = false;
-						}
-						
+						codigo.add(intervalo);						
 					}
 					
 					Contexto c = new Contexto(lido);
@@ -181,25 +126,7 @@ public class Contexto {
 						Codigo intervalo = new Codigo(km1.getIntervaloInteiro(lido));
 						intervalo.setTotal(km1.getTotal());
 						////System.out.println("Inserido -1: " + intervalo);
-						codigo.add(intervalo);
-						
-						if(intervalo.getLow() < 0){
-							//System.out.println("Danou-se o mundo no Low do k = -1.");
-							deuMerda = true;
-						}
-						if(intervalo.getHigh() <= intervalo.getLow()){
-							//System.out.println("Danou-se o mundo no High do k = -1.");
-							deuMerda = true;
-						}
-						if(intervalo.getTotal() < intervalo.getHigh()){
-							//System.out.println("Danou-se o mundo no Total do k = -1.");
-							deuMerda = true;
-						}
-						if(deuMerda){
-							//System.out.println(intervalo);
-							deuMerda = false;
-						}
-						
+						codigo.add(intervalo);						
 					}
 					km1.removeOcorrencia(lido);
 				}
