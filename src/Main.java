@@ -1,4 +1,3 @@
-
 import com.colloquial.arithcode.ArithEncoder;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,8 +11,10 @@ public class Main {
 
     public static void main(String args[]) throws FileNotFoundException, IOException {
 
+        System.out.println("Iniciando leitura...");
         Contexto raiz = new Contexto(0);
         Leitor leitor = null;
+        
         try {
             leitor = new Leitor("texto.txt"); // Arquivo a ser lido
         } catch (IOException ex) {
@@ -52,10 +53,13 @@ public class Main {
         //		Inteiro		low
         //					high
         //					total
+        
+        System.out.println("Gerando código...");
         ArrayList<Codigo> inteiro = Contexto.geraCodigoInteiro(raiz, leitor, 2);
-        System.out.println("Saida:");
+        System.out.println("Código de tamanho " + inteiro.size());
+        
+        System.out.println("Codificando...");
         for (Codigo i : inteiro) {
-            System.out.println(i);
             try {
                 encoder.encode(i.getLow(), i.getHigh(), i.getTotal());
             } catch (IOException ex) {
@@ -63,6 +67,7 @@ public class Main {
             }
         }
 
+        System.out.println("Concluído.");
         return;
     }
 }

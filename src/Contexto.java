@@ -55,10 +55,9 @@ public class Contexto {
 		ArrayList<Byte> ultimos = new ArrayList<Byte>();
 		ArrayList<Byte> alfabeto = leitor.getAlfabeto();
 		ArrayList<Byte> contextoTemp;
-		Collections.sort(alfabeto);
 		Byte lido;
 		boolean jaEntrou = false;
-		
+		boolean deuMerda = false;
 		Contexto km1 = new Contexto(0);
 		for(Byte i : alfabeto){
 			km1.addOcorrencia(new Contexto(i));
@@ -67,7 +66,7 @@ public class Contexto {
 		
 		while((lido = leitor.getNextByte()) != null){
 			
-			System.out.println("lido = " + lido);
+			//System.out.println("lido = " + (char)lido.byteValue());
 
 			//Atualiza a Tabela e Pega intervalos
 			for(int i = -1, j = contextoMaximo; i <= contextoMaximo; i++, j--){
@@ -81,22 +80,40 @@ public class Contexto {
 					
 					//Pega Intervalo
 					Codigo intv = null;
-					//System.out.println("CTEMP = " + contextoTemp + " e lido " + lido);
+					//////System.out.println("CTEMP = " + contextoTemp + " e lido " + lido);
  					if((jaEntrou == false) && (intv = raiz.getIntervaloInteiro(contextoTemp, lido, -1)) != null){
 						jaEntrou = true;
 						Codigo intervalo = new Codigo(intv);
 						intervalo.setTotal(raiz.getTotalFrequencias(contextoTemp, -1));
-						System.out.println("Inserido 1: " + intervalo);
+						////System.out.println("Inserido 1: " + intervalo);
 						codigo.add(intervalo);
 					}else if((jaEntrou == false) && (intv = raiz.getIntervaloInteiroEsc(contextoTemp, -1)) != null){
 						Codigo intervalo = new Codigo(intv);
 						intervalo.setTotal(raiz.getTotalFrequencias(contextoTemp, -1));
-						System.out.println("Inserido ESC 1: " + intervalo);
+						////System.out.println("Inserido ESC 1: " + intervalo);
 						codigo.add(intervalo);
+						
+						if(intervalo.getLow() < 0){
+							//System.out.println("Danou-se o mundo no Low do k = " + j + ".");
+							deuMerda = true;
+						}
+						if(intervalo.getHigh() <= intervalo.getLow()){
+							//System.out.println("Danou-se o mundo no High do k = " + j + ".");
+							deuMerda = true;
+						}
+						if(intervalo.getTotal() < intervalo.getHigh()){
+							//System.out.println("Danou-se o mundo no Total do k = " + j + ".");
+							deuMerda = true;
+						}
+						if(deuMerda){
+							//System.out.println(intervalo);
+							deuMerda = false;
+						}
+						
 					}
 					
 					Contexto c = new Contexto(lido);
-					//System.out.println("Inserindo " + c + " " + contextoTemp);
+					//////System.out.println("Inserindo " + c + " " + contextoTemp);
 					raiz.addOcorrencia(c, contextoTemp, -1);
 					if(raiz.getTotalFilhos(contextoTemp, -1) == alfabeto.size() + 1){
 						raiz.removeEsc(contextoTemp, -1);
@@ -108,13 +125,49 @@ public class Contexto {
 						jaEntrou = true;
 						Codigo intervalo = new Codigo(intv);
 						intervalo.setTotal(raiz.getTotal());
-						System.out.println("Inserido 0: " + intervalo);
+						////System.out.println("Inserido 0: " + intervalo);
 						codigo.add(intervalo);
+						
+						if(intervalo.getLow() < 0){
+							//System.out.println("Danou-se o mundo no Low do k = 0.");
+							deuMerda = true;
+						}
+						if(intervalo.getHigh() <= intervalo.getLow()){
+							//System.out.println("Danou-se o mundo no High do k = 0.");
+							deuMerda = true;
+						}
+						if(intervalo.getTotal() < intervalo.getHigh()){
+							//System.out.println("Danou-se o mundo no Total do k = 0.");
+							deuMerda = true;
+						}
+						if(deuMerda){
+							//System.out.println(intervalo);
+							deuMerda = false;
+						}
+						
 					}else if((jaEntrou == false) && (intv = raiz.getIntervaloInteiroEsc()) != null){
 						Codigo intervalo = new Codigo(intv);
 						intervalo.setTotal(raiz.getTotal());
-						System.out.println("Inserido ESC 0: " + intervalo);
+						////System.out.println("Inserido ESC 0: " + intervalo);
 						codigo.add(intervalo);
+						
+						if(intervalo.getLow() < 0){
+							//System.out.println("Danou-se o mundo no Low do k = 0.");
+							deuMerda = true;
+						}
+						if(intervalo.getHigh() <= intervalo.getLow()){
+							//System.out.println("Danou-se o mundo no High do k = 0.");
+							deuMerda = true;
+						}
+						if(intervalo.getTotal() < intervalo.getHigh()){
+							//System.out.println("Danou-se o mundo no Total do k = 0.");
+							deuMerda = true;
+						}
+						if(deuMerda){
+							//System.out.println(intervalo);
+							deuMerda = false;
+						}
+						
 					}
 					
 					Contexto c = new Contexto(lido);
@@ -127,13 +180,31 @@ public class Contexto {
 					if(jaEntrou == false){
 						Codigo intervalo = new Codigo(km1.getIntervaloInteiro(lido));
 						intervalo.setTotal(km1.getTotal());
-						System.out.println("Inserido -1: " + intervalo);
+						////System.out.println("Inserido -1: " + intervalo);
 						codigo.add(intervalo);
+						
+						if(intervalo.getLow() < 0){
+							//System.out.println("Danou-se o mundo no Low do k = -1.");
+							deuMerda = true;
+						}
+						if(intervalo.getHigh() <= intervalo.getLow()){
+							//System.out.println("Danou-se o mundo no High do k = -1.");
+							deuMerda = true;
+						}
+						if(intervalo.getTotal() < intervalo.getHigh()){
+							//System.out.println("Danou-se o mundo no Total do k = -1.");
+							deuMerda = true;
+						}
+						if(deuMerda){
+							//System.out.println(intervalo);
+							deuMerda = false;
+						}
+						
 					}
 					km1.removeOcorrencia(lido);
 				}
 				
-				//System.out.println("\n\n\n");
+				//////System.out.println("\n\n\n");
 				
 			}
 			jaEntrou = false;
@@ -160,7 +231,7 @@ public class Contexto {
 		
 		while((lido = leitor.getNextByte()) != null){
 			
-			System.out.println("lido = " + lido);
+			////System.out.println("lido = " + lido);
 
 			//Atualiza a Tabela e Pega intervalos
 			for(int i = -1, j = contextoMaximo; i <= contextoMaximo; i++, j--){
@@ -174,18 +245,18 @@ public class Contexto {
 					
 					//Pega Intervalo
 					Intervalo intv = null;
-					//System.out.println("CTEMP = " + contextoTemp + " e lido " + lido);
+					//////System.out.println("CTEMP = " + contextoTemp + " e lido " + lido);
  					if((jaEntrou == false) && (intv = raiz.getIntervalo(contextoTemp, lido, -1)) != null){
 						jaEntrou = true;
-						System.out.println("Inserido 1: " + intv);
+						////System.out.println("Inserido 1: " + intv);
 						codigo.add(new Intervalo(intv));
 					}else if((jaEntrou == false) && (intv = raiz.getIntervaloEsc(contextoTemp, -1)) != null){
-						System.out.println("Inserido ESC 1: " + intv);
+						////System.out.println("Inserido ESC 1: " + intv);
 						codigo.add(new Intervalo(intv));
 					}
 					
 					Contexto c = new Contexto(lido);
-					//System.out.println("Inserindo " + c + " " + contextoTemp);
+					//////System.out.println("Inserindo " + c + " " + contextoTemp);
 					raiz.addOcorrencia(c, contextoTemp, -1);
 					if(raiz.getTotalFilhos(contextoTemp, -1) == alfabeto.size() + 1){
 						raiz.removeEsc(contextoTemp, -1);
@@ -195,10 +266,10 @@ public class Contexto {
 					Intervalo intv = null;
 					if((jaEntrou == false) && (intv = raiz.getIntervalo(lido)) != null){
 						jaEntrou = true;
-						System.out.println("Inserido 0: " + intv);
+						////System.out.println("Inserido 0: " + intv);
 						codigo.add(new Intervalo(intv));
 					}else if((jaEntrou == false) && (intv = raiz.getIntervaloEsc()) != null){
-						System.out.println("Inserido ESC 0: " + intv);
+						////System.out.println("Inserido ESC 0: " + intv);
 						codigo.add(new Intervalo(intv));
 					}
 					
@@ -210,13 +281,13 @@ public class Contexto {
 				}else{
 					
 					if(jaEntrou == false){
-						System.out.println("Inserido -1: " + km1.getIntervalo(lido));
+						////System.out.println("Inserido -1: " + km1.getIntervalo(lido));
 						codigo.add(new Intervalo(km1.getIntervalo(lido)));
 					}
 					km1.removeOcorrencia(lido);
 				}
 				
-				//System.out.println("\n\n\n");
+				//////System.out.println("\n\n\n");
 				
 			}
 			jaEntrou = false;
@@ -253,11 +324,12 @@ public class Contexto {
 	
 	public void removeEsc(ArrayList<Byte> contexto, int nivel){
 		if(nivel > -1){
-			if(this.getValor() != contexto.get(nivel)) return;
+			if(this.isEsc() || this.getValor() != contexto.get(nivel)) return;
 		}
 		
 		if(nivel == contexto.size() - 1) {
 			removeEsc();
+			return;
 		}
 		
 		for(Contexto c : filhos){
@@ -432,7 +504,7 @@ public class Contexto {
 		}
 		
 		if(nivel == contexto.size() - 1) {
-			System.out.println("Contexto size " + contexto.size() + " "  + filhos.size());
+			////System.out.println("Contexto size " + contexto.size() + " "  + filhos.size());
 			Contexto filho = null;
 			for(Contexto c : filhos){
 				if(c.isEsc()){
@@ -592,7 +664,7 @@ public class Contexto {
 		}
 		
 		if(nivel == contexto.size() - 1) {
-			System.out.println("Contexto size " + contexto.size() + " "  + filhos.size());
+			////System.out.println("Contexto size " + contexto.size() + " "  + filhos.size());
 			Contexto filho = null;
 			for(Contexto c : filhos){
 				if(c.isEsc()){
@@ -673,7 +745,7 @@ public class Contexto {
 		}
 		
 		for(Contexto c : filhos){
-			int res = c.getTotalFilhos(contexto, nivel+1);
+			int res = c.getTotalFrequencias(contexto, nivel+1);
 			if(res != -1){
 				return res;
 			}

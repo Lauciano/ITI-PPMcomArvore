@@ -11,10 +11,8 @@ public class Leitor {
 
     private DataInputStream data;
     private byte[] simbolo;
-    private static boolean proximo = true;
-    private static byte bitfinal;
-    private static int bitfinal_aux = -1;
-    private static int index = 0;
+    private int bitfinal;
+    private int index;
     private static final int size_simbolo = 1000;
     private String nomeArq;
 
@@ -22,7 +20,9 @@ public class Leitor {
 
         this.nomeArq = nomeArq;
         data = new DataInputStream(new BufferedInputStream(new FileInputStream(nomeArq)));
-        simbolo = new byte[5];
+        simbolo = new byte[size_simbolo];
+        bitfinal = 0;
+        index = 0;
 
     }
 
@@ -37,7 +37,8 @@ public class Leitor {
         while ((i = data_aux.read(simbolo_aux)) > -1) {
             for (j = 0; j < i; j++) {
                 if (!alfabeto.contains(simbolo_aux[j])) {
-                    alfabeto.add((byte) (simbolo_aux[j] & 0xff));
+                    alfabeto.add(simbolo_aux[j]);
+                    //System.out.println("Adicionado " + (char) (simbolo_aux[j]));
                 }
 
             }
@@ -53,8 +54,26 @@ public class Leitor {
 
     public Byte getNextByte() throws IOException {
 
+    	if(index >= bitfinal){
+    		if ((bitfinal = data.read(simbolo)) > -1) {
+    			
+    			//System.out.println("Li um novo array: ");
+    			//for(int i = 0; i < bitfinal; i++){
+    			//	System.out.println((char) simbolo[i] + " - " + (int) simbolo[i]);
+    			//}
+    			
+                index = 0;
+            } else {
+                data.close();
+                return null;
+            }
+    	}
+    	
+    	return simbolo[index++];
+    	
+    	/*
         if (proximo) {
-            if ((bitfinal = (byte) data.read(simbolo)) > -1) {
+            if ((bitfinal = data.read(simbolo)) > -1) {
                 index = -1;
                 proximo = false;
             } else {
@@ -83,7 +102,7 @@ public class Leitor {
         //System.out.println((char) simbolo[index]);
         
         return simbolo[index];
-        
+        */
 
     }
 }
